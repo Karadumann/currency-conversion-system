@@ -15,7 +15,7 @@ import {
   ListItemText,
   Paper
 } from '@mui/material';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import axios from 'axios';
 import './App.css';
 
@@ -118,7 +118,7 @@ function App() {
                 </Select>
 
                 <IconButton onClick={handleSwapCurrencies}>
-                  <SwapHorizIcon />
+                  <CompareArrowsIcon />
                 </IconButton>
 
                 <Select
