@@ -24,6 +24,7 @@ interface ConversionHistory {
   to: string;
   amount: string;
   result: number;
+  rate: number;
   date: Date;
 }
 
@@ -38,6 +39,7 @@ function App() {
   const [currencies] = useState<string[]>([
     'USD', 'EUR', 'TRY', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'INR', 'BGN'
   ]);
+  const [currentRate, setCurrentRate] = useState<number | null>(null);
 
   const handleSwapCurrencies = () => {
     setFromCurrency(toCurrency);
@@ -61,6 +63,7 @@ function App() {
       const rate = response.data.rates[toCurrency];
       const convertedAmount = parseFloat(amount) * rate;
       setResult(convertedAmount);
+      setCurrentRate(rate);
 
       // Add to history
       const newConversion: ConversionHistory = {
@@ -68,9 +71,10 @@ function App() {
         to: toCurrency,
         amount,
         result: convertedAmount,
+        rate: rate,
         date: new Date()
       };
-      setHistory(prev => [newConversion, ...prev].slice(0, 5)); // Keep last 5 conversions
+      setHistory(prev => [newConversion, ...prev].slice(0, 5));
     } catch (error) {
       setError('Failed to fetch exchange rate. Please try again.');
       console.error('Error fetching exchange rate:', error);
@@ -144,10 +148,18 @@ function App() {
                 {loading ? <CircularProgress size={24} /> : 'Convert'}
               </Button>
 
-              {result !== null && (
-                <Typography variant="h5" align="center" sx={{ mt: 2 }}>
-                  {amount} {fromCurrency} = {result.toFixed(2)} {toCurrency}
-                </Typography>
+              {result !== null && currentRate !== null && (
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Typography variant="h5">
+                    {amount} {fromCurrency} = {result.toFixed(2)} {toCurrency}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Exchange Rate: 1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Last Updated: {new Date().toLocaleString()}
+                  </Typography>
+                </Box>
               )}
             </Box>
           </Paper>
@@ -162,8 +174,21 @@ function App() {
               {history.map((item, index) => (
                 <ListItem key={index} divider={index !== history.length - 1}>
                   <ListItemText
-                    primary={`${item.amount} ${item.from} = ${item.result.toFixed(2)} ${item.to}`}
-                    secondary={item.date.toLocaleString()}
+                    primary={
+                      <Typography>
+                        {item.amount} {item.from} = {item.result.toFixed(2)} {item.to}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" color="text.secondary">
+                          Rate: 1 {item.from} = {item.rate.toFixed(4)} {item.to}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.date.toLocaleString()}
+                        </Typography>
+                      </>
+                    }
                   />
                 </ListItem>
               ))}
