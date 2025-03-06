@@ -36,7 +36,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<ConversionHistory[]>([]);
   const [currencies] = useState<string[]>([
-    'USD', 'EUR', 'TRY', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'INR'
+    'USD', 'EUR', 'TRY', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'INR', 'BGN'
   ]);
 
   const handleSwapCurrencies = () => {
