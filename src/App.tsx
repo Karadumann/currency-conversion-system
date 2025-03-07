@@ -41,6 +41,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import './App.css';
+import NewsSection from './components/NewsSection';
+import EconomicCalendar from './components/EconomicCalendar';
 
 interface ConversionHistory {
   from: string;
@@ -551,6 +553,15 @@ function App() {
               </Paper>
             </>
           )}
+
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid item xs={12} md={6}>
+              <NewsSection fromCurrency={fromCurrency} toCurrency={toCurrency} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <EconomicCalendar fromCurrency={fromCurrency} toCurrency={toCurrency} />
+            </Grid>
+          </Grid>
 
           {alarms.length > 0 && (
             <Paper elevation={3} sx={{ p: 3 }}>

@@ -1,10 +1,10 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Currency App",
+  "name": "Currency Converter & News",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "64x64",
       "type": "image/x-icon"
     },
     {
@@ -21,5 +21,17 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "description": "A currency converter app with real-time rates, news, and economic calendar",
+  "categories": ["finance", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Convert Currency",
+      "short_name": "Convert",
+      "description": "Start a new currency conversion",
+      "url": "/"
+    }
+  ]
 }
