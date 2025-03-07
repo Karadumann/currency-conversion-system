@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Container, 
   TextField, 
@@ -13,9 +13,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Paper,
-  Tab,
-  Tabs
+  Paper
 } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -45,11 +43,12 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<ConversionHistory[]>([]);
   const [currencies] = useState<string[]>([
-    'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'JPY', 'BGN'
+    'USD', 'EUR', 'TRY', 'GBP', 'AUD', 'CAD', 'CHF', 'JPY', 'BGN'
   ]);
   const [currentRate, setCurrentRate] = useState<number | null>(null);
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
   const [showChart, setShowChart] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   const fetchRateHistory = async () => {
     try {
@@ -80,20 +79,18 @@ function App() {
     }
   };
 
-  const handleConvert = async () => {
-    if (!amount || isNaN(Number(amount))) {
-      setError('Please enter a valid amount');
+  const handleDateConvert = async () => {
+    if (!amount || isNaN(Number(amount)) || !selectedDate) {
+      setError('Please enter a valid amount and date');
       return;
     }
 
     setLoading(true);
     setError(null);
-    setShowChart(false);
 
     try {
-      // Use Frankfurter API for current rate
       const response = await axios.get(
-        `https://api.frankfurter.app/latest?from=${fromCurrency}&to=${toCurrency}&amount=${amount}`
+        `https://api.frankfurter.app/${selectedDate}?from=${fromCurrency}&to=${toCurrency}&amount=${amount}`
       );
 
       const convertedAmount = response.data.rates[toCurrency];
@@ -109,14 +106,14 @@ function App() {
         amount,
         result: convertedAmount,
         rate: rate,
-        date: new Date()
+        date: new Date(selectedDate)
       };
       setHistory(prev => [newConversion, ...prev].slice(0, 5));
 
-      // Fetch historical data after conversion
+      // Fetch historical data
       await fetchRateHistory();
     } catch (error) {
-      setError('Failed to fetch exchange rate. Please try again.');
+      setError('Failed to fetch historical exchange rate. Please try again.');
       console.error('Error fetching exchange rate:', error);
     } finally {
       setLoading(false);
@@ -183,9 +180,21 @@ function App() {
               </Select>
             </Box>
 
+            <TextField
+              label="Select Date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              fullWidth
+              error={!!error && !selectedDate}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+
             <Button
               variant="contained"
-              onClick={handleConvert}
+              onClick={handleDateConvert}
               fullWidth
               disabled={loading}
               sx={{ mt: 2 }}
@@ -199,10 +208,7 @@ function App() {
                   {amount} {fromCurrency} = {result.toFixed(2)} {toCurrency}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Exchange Rate: 1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Last Updated: {new Date().toLocaleString()}
+                  Exchange Rate on {new Date(selectedDate).toLocaleDateString()}: 1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
                 </Typography>
               </Box>
             )}
