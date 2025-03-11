@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Container,
   TextField,
@@ -21,6 +21,9 @@ import { useCurrencyConverter } from '../hooks/useCurrencyConverter';
 import ConversionHistory from './ConversionHistory';
 import RateAnalysis from './RateAnalysis';
 import RateChart from './RateChart';
+import LoadingSkeleton from './LoadingSkeleton';
+import ChartLoadingSkeleton from './ChartLoadingSkeleton';
+import { debounce } from '../utils/memoization';
 
 const CurrencyConverter: React.FC = () => {
   const {
@@ -41,6 +44,28 @@ const CurrencyConverter: React.FC = () => {
     swapCurrencies
   } = useCurrencyConverter();
 
+  // Memoize currency options to prevent unnecessary re-renders
+  const currencyOptions = useMemo(() => 
+    CURRENCIES.map((currency) => (
+      <MenuItem key={currency} value={currency}>
+        {currency}
+      </MenuItem>
+    )),
+    []
+  );
+
+  // Debounce amount changes to prevent too many re-renders
+  const handleAmountChange = useCallback(
+    debounce((value: string) => {
+      setAmount(value);
+    }, 300),
+    [setAmount]
+  );
+
+  if (loading && !result) {
+    return <LoadingSkeleton />;
+  }
+
   return (
     <Container maxWidth="lg">
       <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
@@ -55,8 +80,8 @@ const CurrencyConverter: React.FC = () => {
             <TextField
               fullWidth
               label="Amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              defaultValue={amount}
+              onChange={(e) => handleAmountChange(e.target.value)}
               type="number"
               error={Boolean(error)}
             />
@@ -70,11 +95,7 @@ const CurrencyConverter: React.FC = () => {
                 onChange={(e) => setFromCurrency(e.target.value)}
                 label="From"
               >
-                {CURRENCIES.map((currency) => (
-                  <MenuItem key={currency} value={currency}>
-                    {currency}
-                  </MenuItem>
-                ))}
+                {currencyOptions}
               </Select>
             </FormControl>
           </Grid>
@@ -95,11 +116,7 @@ const CurrencyConverter: React.FC = () => {
                 onChange={(e) => setToCurrency(e.target.value)}
                 label="To"
               >
-                {CURRENCIES.map((currency) => (
-                  <MenuItem key={currency} value={currency}>
-                    {currency}
-                  </MenuItem>
-                ))}
+                {currencyOptions}
               </Select>
             </FormControl>
           </Grid>
@@ -139,15 +156,19 @@ const CurrencyConverter: React.FC = () => {
         </Grid>
       </Paper>
 
-      {rateHistory.length > 0 && (
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid item xs={12} md={8}>
-            <RateChart data={rateHistory} fromCurrency={fromCurrency} toCurrency={toCurrency} />
+      {loading && rateHistory.length === 0 ? (
+        <ChartLoadingSkeleton />
+      ) : (
+        rateHistory.length > 0 && (
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid item xs={12} md={8}>
+              <RateChart data={rateHistory} fromCurrency={fromCurrency} toCurrency={toCurrency} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <RateAnalysis analysis={rateAnalysis} fromCurrency={fromCurrency} toCurrency={toCurrency} />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <RateAnalysis analysis={rateAnalysis} fromCurrency={fromCurrency} toCurrency={toCurrency} />
-          </Grid>
-        </Grid>
+        )
       )}
 
       <ConversionHistory history={history} />
@@ -155,4 +176,4 @@ const CurrencyConverter: React.FC = () => {
   );
 };
 
-export default CurrencyConverter; 
+export default React.memo(CurrencyConverter); 

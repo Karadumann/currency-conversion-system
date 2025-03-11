@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Paper, Typography } from '@mui/material';
 import {
   LineChart,
@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { RateHistory } from '../types';
+import { memoizedDateFormatter, memoizedNumberFormatter } from '../utils/memoization';
 
 interface RateChartProps {
   data: RateHistory[];
@@ -18,6 +19,9 @@ interface RateChartProps {
 }
 
 const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency }) => {
+  // Memoize chart data to prevent unnecessary calculations
+  const chartData = useMemo(() => data, [data]);
+
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
@@ -26,7 +30,7 @@ const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency })
       <div style={{ width: '100%', height: 400 }}>
         <ResponsiveContainer>
           <LineChart
-            data={data}
+            data={chartData}
             margin={{
               top: 5,
               right: 30,
@@ -37,15 +41,15 @@ const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency })
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
-              tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              tickFormatter={memoizedDateFormatter}
             />
             <YAxis
               domain={['auto', 'auto']}
-              tickFormatter={(value) => value.toFixed(4)}
+              tickFormatter={(value) => memoizedNumberFormatter(value)}
             />
             <Tooltip
-              labelFormatter={(date) => new Date(date).toLocaleDateString()}
-              formatter={(value: number) => [value.toFixed(4), 'Rate']}
+              labelFormatter={memoizedDateFormatter}
+              formatter={(value: number) => [memoizedNumberFormatter(value), 'Rate']}
             />
             <Line
               type="monotone"
@@ -53,6 +57,7 @@ const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency })
               stroke="#8884d8"
               dot={false}
               activeDot={{ r: 8 }}
+              isAnimationActive={false} // Disable animation for better performance
             />
           </LineChart>
         </ResponsiveContainer>
@@ -61,4 +66,4 @@ const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency })
   );
 };
 
-export default RateChart; 
+export default React.memo(RateChart); 

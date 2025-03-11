@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Paper,
   Typography,
@@ -8,10 +8,46 @@ import {
   Divider
 } from '@mui/material';
 import { ConversionHistory as ConversionHistoryType } from '../types';
+import { memoizedNumberFormatter } from '../utils/memoization';
 
 interface ConversionHistoryProps {
   history: ConversionHistoryType[];
 }
+
+const ConversionHistoryItem: React.FC<{ item: ConversionHistoryType; isLast: boolean }> = React.memo(
+  ({ item, isLast }) => {
+    const formattedValues = useMemo(() => ({
+      result: memoizedNumberFormatter(item.result, 2),
+      rate: memoizedNumberFormatter(item.rate),
+      date: new Date(item.date).toLocaleString()
+    }), [item]);
+
+    return (
+      <React.Fragment>
+        {!isLast && <Divider />}
+        <ListItem>
+          <ListItemText
+            primary={
+              <Typography>
+                {item.amount} {item.from} = {formattedValues.result} {item.to}
+              </Typography>
+            }
+            secondary={
+              <>
+                <Typography variant="body2" color="textSecondary">
+                  Rate: 1 {item.from} = {formattedValues.rate} {item.to}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {formattedValues.date}
+                </Typography>
+              </>
+            }
+          />
+        </ListItem>
+      </React.Fragment>
+    );
+  }
+);
 
 const ConversionHistory: React.FC<ConversionHistoryProps> = ({ history }) => {
   if (history.length === 0) return null;
@@ -23,32 +59,15 @@ const ConversionHistory: React.FC<ConversionHistoryProps> = ({ history }) => {
       </Typography>
       <List>
         {history.map((item, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && <Divider />}
-            <ListItem>
-              <ListItemText
-                primary={
-                  <Typography>
-                    {item.amount} {item.from} = {item.result.toFixed(2)} {item.to}
-                  </Typography>
-                }
-                secondary={
-                  <>
-                    <Typography variant="body2" color="textSecondary">
-                      Rate: 1 {item.from} = {item.rate.toFixed(4)} {item.to}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {new Date(item.date).toLocaleString()}
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-          </React.Fragment>
+          <ConversionHistoryItem
+            key={item.date.getTime()}
+            item={item}
+            isLast={index === history.length - 1}
+          />
         ))}
       </List>
     </Paper>
   );
 };
 
-export default ConversionHistory; 
+export default React.memo(ConversionHistory); 
