@@ -25,6 +25,7 @@ import RateChart from './RateChart';
 import LoadingSkeleton from './LoadingSkeleton';
 import ChartLoadingSkeleton from './ChartLoadingSkeleton';
 import { debounce } from '../utils/memoization';
+import RateAlarmManager from './RateAlarmManager';
 
 const CurrencyConverter: React.FC = () => {
   const {
@@ -56,11 +57,13 @@ const CurrencyConverter: React.FC = () => {
   );
 
   // Debounce amount changes to prevent too many re-renders
-  const handleAmountChange = useCallback(
-    debounce((value: string) => {
-      setAmount(value);
-    }, 300),
-    [setAmount]
+  const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+  }, [setAmount]);
+
+  const debouncedHandleAmountChange = useMemo(
+    () => debounce(handleAmountChange, 300),
+    [handleAmountChange]
   );
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -88,7 +91,7 @@ const CurrencyConverter: React.FC = () => {
               fullWidth
               label="Amount"
               defaultValue={amount}
-              onChange={(e) => handleAmountChange(e.target.value)}
+              onChange={debouncedHandleAmountChange}
               onKeyPress={handleKeyPress}
               type="number"
               error={Boolean(error)}
@@ -206,6 +209,12 @@ const CurrencyConverter: React.FC = () => {
           </Grid>
         )
       )}
+
+      <RateAlarmManager 
+        fromCurrency={fromCurrency}
+        toCurrency={toCurrency}
+        currentRate={currentRate}
+      />
 
       <ConversionHistory history={history} />
     </Container>

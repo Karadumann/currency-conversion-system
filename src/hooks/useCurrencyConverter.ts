@@ -14,75 +14,57 @@ export const useCurrencyConverter = () => {
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
   const [rateAnalysis, setRateAnalysis] = useState<RateAnalysis | null>(null);
 
-  const analyzeRates = (rates: RateHistory[]): RateAnalysis => {
-    if (rates.length === 0) throw new Error('No rates to analyze');
-
-    const sortedRates = [...rates].sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    
-    const highest = sortedRates.reduce((max, current) => 
-      current.rate > max.rate ? current : max
-    , sortedRates[0]);
-
-    const lowest = sortedRates.reduce((min, current) => 
-      current.rate < min.rate ? current : min
-    , sortedRates[0]);
-
-    const average = sortedRates.reduce((sum, current) => 
-      sum + current.rate, 0
-    ) / sortedRates.length;
-
-    const firstRate = sortedRates[0].rate;
-    const lastRate = sortedRates[sortedRates.length - 1].rate;
-    const percentageChange = ((lastRate - firstRate) / firstRate) * 100;
-
-    let trend: 'up' | 'down' | 'stable' = 'stable';
-    if (percentageChange > 1) trend = 'up';
-    else if (percentageChange < -1) trend = 'down';
-
-    return {
-      highest,
-      lowest,
-      average,
-      percentageChange,
-      trend
-    };
-  };
-
   const convert = async () => {
-    if (!amount || isNaN(Number(amount))) {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       setError('Please enter a valid amount');
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
+      setLoading(true);
+      setError(null);
+
       const rate = await currencyService.getLatestRate(fromCurrency, toCurrency);
       const convertedAmount = Number(amount) * rate;
       
       setResult(convertedAmount);
       setCurrentRate(rate);
-
-      const newConversion: ConversionHistory = {
+      
+      // Add to history
+      const historyItem: ConversionHistory = {
         from: fromCurrency,
         to: toCurrency,
-        amount,
+        amount: Number(amount),
         result: convertedAmount,
         rate,
         date: new Date()
       };
-      setHistory(prev => [newConversion, ...prev].slice(0, 5));
-
-      // Fetch and analyze historical data
-      const historyData = await currencyService.getRateHistory(fromCurrency, toCurrency);
-      setRateHistory(historyData);
-      setRateAnalysis(analyzeRates(historyData));
-    } catch (error) {
-      setError('Failed to fetch exchange rate. Please try again.');
-      console.error('Error fetching exchange rate:', error);
+      
+      setHistory(prev => [historyItem, ...prev].slice(0, 10));
+      
+      // Get rate history and analysis
+      const rateHistoryData = await currencyService.getRateHistory(fromCurrency, toCurrency);
+      setRateHistory(rateHistoryData);
+      
+      // Calculate rate analysis
+      const analysis: RateAnalysis = {
+        highest: {
+          rate: Math.max(...rateHistoryData.map(d => d.rate)),
+          date: rateHistoryData.reduce((a, b) => a.rate > b.rate ? a : b).date
+        },
+        lowest: {
+          rate: Math.min(...rateHistoryData.map(d => d.rate)),
+          date: rateHistoryData.reduce((a, b) => a.rate < b.rate ? a : b).date
+        },
+        average: rateHistoryData.reduce((sum, curr) => sum + curr.rate, 0) / rateHistoryData.length,
+        percentageChange: ((rate - rateHistoryData[rateHistoryData.length - 1].rate) / rateHistoryData[rateHistoryData.length - 1].rate) * 100,
+        trend: rate > rateHistoryData[rateHistoryData.length - 1].rate ? 'up' : rate < rateHistoryData[rateHistoryData.length - 1].rate ? 'down' : 'stable'
+      };
+      
+      setRateAnalysis(analysis);
+    } catch (err) {
+      setError('Failed to convert currency. Please try again.');
+      console.error('Conversion error:', err);
     } finally {
       setLoading(false);
     }
@@ -91,7 +73,6 @@ export const useCurrencyConverter = () => {
   const swapCurrencies = () => {
     setFromCurrency(toCurrency);
     setToCurrency(fromCurrency);
-    setResult(null);
   };
 
   return {

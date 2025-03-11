@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { Paper, Typography, List, ListItem, ListItemText, Chip } from '@mui/material';
+import {
+  Paper,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+} from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { RateAnalysis as RateAnalysisType } from '../types';
@@ -12,10 +19,10 @@ interface RateAnalysisProps {
 }
 
 const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toCurrency }) => {
-  if (!analysis) return null;
-
-  // Memoize trend color and icon calculations
+  // Move useMemo hooks to the top level
   const trendInfo = useMemo(() => {
+    if (!analysis) return { color: 'default', icon: null, description: 'No data' };
+
     const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
       switch (trend) {
         case 'up':
@@ -54,17 +61,22 @@ const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toC
       icon: getTrendIcon(analysis.trend),
       description: getTrendDescription(analysis.trend)
     };
-  }, [analysis.trend]);
+  }, [analysis]);
 
-  // Memoize formatted values
-  const formattedValues = useMemo(() => ({
-    highestRate: memoizedNumberFormatter(analysis.highest.rate),
-    highestDate: memoizedDateFormatter(analysis.highest.date),
-    lowestRate: memoizedNumberFormatter(analysis.lowest.rate),
-    lowestDate: memoizedDateFormatter(analysis.lowest.date),
-    averageRate: memoizedNumberFormatter(analysis.average),
-    percentageChange: memoizedNumberFormatter(analysis.percentageChange, 2)
-  }), [analysis]);
+  const formattedValues = useMemo(() => {
+    if (!analysis) return null;
+
+    return {
+      highestRate: memoizedNumberFormatter(analysis.highest.rate),
+      highestDate: memoizedDateFormatter(analysis.highest.date),
+      lowestRate: memoizedNumberFormatter(analysis.lowest.rate),
+      lowestDate: memoizedDateFormatter(analysis.lowest.date),
+      averageRate: memoizedNumberFormatter(analysis.average),
+      percentageChange: memoizedNumberFormatter(analysis.percentageChange, 2)
+    };
+  }, [analysis]);
+
+  if (!analysis || !formattedValues) return null;
 
   return (
     <Paper 
@@ -131,9 +143,9 @@ const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toC
             }
             secondary={
               <Chip
-                icon={trendInfo.icon}
+                icon={trendInfo.icon || undefined}
                 label={`${formattedValues.percentageChange}%`}
-                color={trendInfo.color}
+                color={trendInfo.color as 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'}
                 variant="outlined"
                 role="status"
                 aria-label={`${trendInfo.description}: ${formattedValues.percentageChange}% change`}

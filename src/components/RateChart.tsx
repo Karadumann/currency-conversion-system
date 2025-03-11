@@ -87,7 +87,7 @@ const RateChart: React.FC<RateChartProps> = ({ data, fromCurrency, toCurrency })
               labelFormatter={memoizedDateFormatter}
               formatter={(value: number) => [memoizedNumberFormatter(value), 'Rate']}
               wrapperStyle={{ outline: 'none' }}
-              role="tooltip"
+              aria-label="Chart tooltip"
             />
             <Line
               type="monotone"

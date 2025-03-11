@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RateAlarm } from '../types';
 import { currencyService } from '../services/currencyService';
 
@@ -8,19 +8,30 @@ export const useRateAlarms = () => {
   const [targetRate, setTargetRate] = useState<string>('');
   const [alarmCondition, setAlarmCondition] = useState<'above' | 'below'>('above');
 
-  const addAlarm = (fromCurrency: string, toCurrency: string) => {
-    if (!targetRate || isNaN(Number(targetRate))) {
-      console.error('Invalid target rate');
-      return;
+  const addAlarm = (fromCurrency: string, toCurrency: string, targetRate: number, condition: 'above' | 'below') => {
+    if (targetRate <= 0) {
+      throw new Error('Target rate must be greater than 0');
+    }
+
+    const existingAlarm = alarms.find(
+      alarm => alarm.fromCurrency === fromCurrency && 
+               alarm.toCurrency === toCurrency && 
+               alarm.targetRate === targetRate &&
+               alarm.condition === condition
+    );
+
+    if (existingAlarm) {
+      throw new Error('An alarm with these parameters already exists');
     }
 
     const newAlarm: RateAlarm = {
       id: Date.now().toString(),
       fromCurrency,
       toCurrency,
-      targetRate: Number(targetRate),
-      condition: alarmCondition,
-      isActive: true
+      targetRate,
+      condition,
+      isActive: true,
+      createdAt: new Date()
     };
 
     setAlarms(prev => [...prev, newAlarm]);
@@ -38,7 +49,7 @@ export const useRateAlarms = () => {
     ));
   };
 
-  const checkAlarms = async () => {
+  const checkAlarms = useCallback(async () => {
     for (const alarm of alarms) {
       if (!alarm.isActive) continue;
 
@@ -49,24 +60,27 @@ export const useRateAlarms = () => {
         );
 
         const isTriggered = alarm.condition === 'above' 
-          ? currentRate > alarm.targetRate
-          : currentRate < alarm.targetRate;
+          ? currentRate >= alarm.targetRate
+          : currentRate <= alarm.targetRate;
 
         if (isTriggered) {
           // Here you could implement notification logic
-          console.log(`Alarm triggered: ${alarm.fromCurrency}/${alarm.toCurrency} rate is ${alarm.condition} ${alarm.targetRate}`);
+          console.log(`Alarm triggered: ${alarm.fromCurrency}/${alarm.toCurrency} ${alarm.condition} ${alarm.targetRate}`);
+          
+          // Deactivate the alarm after triggering
+          toggleAlarm(alarm.id);
         }
       } catch (error) {
         console.error('Error checking alarm:', error);
       }
     }
-  };
+  }, [alarms, toggleAlarm]);
 
   // Check alarms every 5 minutes
   useEffect(() => {
     const interval = setInterval(checkAlarms, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [alarms]);
+  }, [checkAlarms]);
 
   return {
     alarms,

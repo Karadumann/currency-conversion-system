@@ -1,7 +1,7 @@
 export interface ConversionHistory {
   from: string;
   to: string;
-  amount: string;
+  amount: number;
   result: number;
   rate: number;
   date: Date;
@@ -13,8 +13,14 @@ export interface RateHistory {
 }
 
 export interface RateAnalysis {
-  highest: { rate: number; date: string };
-  lowest: { rate: number; date: string };
+  highest: {
+    rate: number;
+    date: string;
+  };
+  lowest: {
+    rate: number;
+    date: string;
+  };
   average: number;
   percentageChange: number;
   trend: 'up' | 'down' | 'stable';
@@ -27,4 +33,5 @@ export interface RateAlarm {
   targetRate: number;
   condition: 'above' | 'below';
   isActive: boolean;
+  createdAt: Date;
 } 
