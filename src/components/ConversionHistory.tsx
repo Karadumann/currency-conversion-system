@@ -22,26 +22,30 @@ const ConversionHistoryItem: React.FC<{ item: ConversionHistoryType; isLast: boo
       date: new Date(item.date).toLocaleString()
     }), [item]);
 
+    const conversionDescription = `${item.amount} ${item.from} converted to ${formattedValues.result} ${item.to}`;
+    const rateDescription = `Exchange rate: 1 ${item.from} equals ${formattedValues.rate} ${item.to}`;
+
     return (
       <React.Fragment>
-        {!isLast && <Divider />}
-        <ListItem>
+        {!isLast && <Divider role="presentation" />}
+        <ListItem role="listitem">
           <ListItemText
             primary={
-              <Typography>
-                {item.amount} {item.from} = {formattedValues.result} {item.to}
+              <Typography component="h3" variant="subtitle1">
+                {conversionDescription}
               </Typography>
             }
             secondary={
               <>
-                <Typography variant="body2" color="textSecondary">
-                  Rate: 1 {item.from} = {formattedValues.rate} {item.to}
+                <Typography component="p" variant="body2" color="textSecondary">
+                  {rateDescription}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {formattedValues.date}
+                <Typography component="p" variant="body2" color="textSecondary">
+                  Converted on {formattedValues.date}
                 </Typography>
               </>
             }
+            aria-label={`${conversionDescription}. ${rateDescription}. Converted on ${formattedValues.date}`}
           />
         </ListItem>
       </React.Fragment>
@@ -53,11 +57,19 @@ const ConversionHistory: React.FC<ConversionHistoryProps> = ({ history }) => {
   if (history.length === 0) return null;
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
-      <Typography variant="h6" gutterBottom>
+    <Paper 
+      elevation={3} 
+      sx={{ p: 3, mt: 3 }}
+      role="region"
+      aria-label="Conversion History"
+    >
+      <Typography variant="h6" component="h2" gutterBottom>
         Recent Conversions
       </Typography>
-      <List>
+      <List 
+        aria-label="List of recent currency conversions"
+        role="list"
+      >
         {history.map((item, index) => (
           <ConversionHistoryItem
             key={item.date.getTime()}

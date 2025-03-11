@@ -30,17 +30,29 @@ const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toC
     const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
       switch (trend) {
         case 'up':
-          return <TrendingUpIcon />;
+          return <TrendingUpIcon aria-hidden="true" />;
         case 'down':
-          return <TrendingDownIcon />;
+          return <TrendingDownIcon aria-hidden="true" />;
         default:
           return null;
       }
     };
 
+    const getTrendDescription = (trend: 'up' | 'down' | 'stable') => {
+      switch (trend) {
+        case 'up':
+          return 'Increasing trend';
+        case 'down':
+          return 'Decreasing trend';
+        default:
+          return 'Stable trend';
+      }
+    };
+
     return {
       color: getTrendColor(analysis.trend),
-      icon: getTrendIcon(analysis.trend)
+      icon: getTrendIcon(analysis.trend),
+      description: getTrendDescription(analysis.trend)
     };
   }, [analysis.trend]);
 
@@ -55,38 +67,76 @@ const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toC
   }), [analysis]);
 
   return (
-    <Paper elevation={3} sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
+    <Paper 
+      elevation={3} 
+      sx={{ p: 3 }}
+      role="region"
+      aria-label={`Rate analysis for ${fromCurrency} to ${toCurrency}`}
+    >
+      <Typography variant="h6" component="h2" gutterBottom>
         Rate Analysis
       </Typography>
-      <List>
-        <ListItem>
+      <List aria-label="Exchange rate statistics">
+        <ListItem divider>
           <ListItemText
-            primary="Highest Rate"
-            secondary={`${formattedValues.highestRate} on ${formattedValues.highestDate}`}
+            primary={
+              <Typography component="h3" variant="subtitle1">
+                Highest Rate
+              </Typography>
+            }
+            secondary={
+              <Typography component="p" variant="body2">
+                {formattedValues.highestRate} on {formattedValues.highestDate}
+              </Typography>
+            }
+            aria-label={`Highest rate: ${formattedValues.highestRate} on ${formattedValues.highestDate}`}
+          />
+        </ListItem>
+        <ListItem divider>
+          <ListItemText
+            primary={
+              <Typography component="h3" variant="subtitle1">
+                Lowest Rate
+              </Typography>
+            }
+            secondary={
+              <Typography component="p" variant="body2">
+                {formattedValues.lowestRate} on {formattedValues.lowestDate}
+              </Typography>
+            }
+            aria-label={`Lowest rate: ${formattedValues.lowestRate} on ${formattedValues.lowestDate}`}
+          />
+        </ListItem>
+        <ListItem divider>
+          <ListItemText
+            primary={
+              <Typography component="h3" variant="subtitle1">
+                Average Rate
+              </Typography>
+            }
+            secondary={
+              <Typography component="p" variant="body2">
+                {formattedValues.averageRate}
+              </Typography>
+            }
+            aria-label={`Average rate: ${formattedValues.averageRate}`}
           />
         </ListItem>
         <ListItem>
           <ListItemText
-            primary="Lowest Rate"
-            secondary={`${formattedValues.lowestRate} on ${formattedValues.lowestDate}`}
-          />
-        </ListItem>
-        <ListItem>
-          <ListItemText
-            primary="Average Rate"
-            secondary={formattedValues.averageRate}
-          />
-        </ListItem>
-        <ListItem>
-          <ListItemText
-            primary="Change"
+            primary={
+              <Typography component="h3" variant="subtitle1">
+                Change
+              </Typography>
+            }
             secondary={
               <Chip
                 icon={trendInfo.icon}
                 label={`${formattedValues.percentageChange}%`}
                 color={trendInfo.color}
                 variant="outlined"
+                role="status"
+                aria-label={`${trendInfo.description}: ${formattedValues.percentageChange}% change`}
               />
             }
           />

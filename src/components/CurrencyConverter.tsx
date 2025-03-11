@@ -13,7 +13,8 @@ import {
   Paper,
   Grid,
   FormControl,
-  InputLabel
+  InputLabel,
+  FormHelperText
 } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { CURRENCIES } from '../constants';
@@ -62,16 +63,22 @@ const CurrencyConverter: React.FC = () => {
     [setAmount]
   );
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      convert();
+    }
+  };
+
   if (loading && !result) {
     return <LoadingSkeleton />;
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" role="main" aria-label="Currency Converter">
       <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" component="h1" gutterBottom>
               Currency Converter
             </Typography>
           </Grid>
@@ -82,27 +89,43 @@ const CurrencyConverter: React.FC = () => {
               label="Amount"
               defaultValue={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
+              onKeyPress={handleKeyPress}
               type="number"
               error={Boolean(error)}
+              inputProps={{
+                'aria-label': 'Enter amount to convert',
+                'aria-describedby': error ? 'amount-error' : undefined,
+                min: "0",
+                step: "0.01"
+              }}
+              helperText={error && <span id="amount-error">{error}</span>}
             />
           </Grid>
 
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>From</InputLabel>
+              <InputLabel id="from-currency-label">From</InputLabel>
               <Select
+                labelId="from-currency-label"
+                id="from-currency"
                 value={fromCurrency}
                 onChange={(e) => setFromCurrency(e.target.value)}
                 label="From"
+                aria-label="Select source currency"
               >
                 {currencyOptions}
               </Select>
+              <FormHelperText>Select source currency</FormHelperText>
             </FormControl>
           </Grid>
 
           <Grid item xs={12} md={1}>
             <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-              <IconButton onClick={swapCurrencies} color="primary">
+              <IconButton 
+                onClick={swapCurrencies} 
+                color="primary"
+                aria-label="Swap currencies"
+              >
                 <CompareArrowsIcon />
               </IconButton>
             </Box>
@@ -110,14 +133,18 @@ const CurrencyConverter: React.FC = () => {
 
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>To</InputLabel>
+              <InputLabel id="to-currency-label">To</InputLabel>
               <Select
+                labelId="to-currency-label"
+                id="to-currency"
                 value={toCurrency}
                 onChange={(e) => setToCurrency(e.target.value)}
                 label="To"
+                aria-label="Select target currency"
               >
                 {currencyOptions}
               </Select>
+              <FormHelperText>Select target currency</FormHelperText>
             </FormControl>
           </Grid>
 
@@ -128,26 +155,35 @@ const CurrencyConverter: React.FC = () => {
               onClick={convert}
               disabled={loading}
               sx={{ height: '100%' }}
+              aria-label="Convert currencies"
+              aria-busy={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Convert'}
+              {loading ? <CircularProgress size={24} aria-label="Converting..." /> : 'Convert'}
             </Button>
           </Grid>
 
           {error && (
             <Grid item xs={12}>
-              <Alert severity="error">{error}</Alert>
+              <Alert severity="error" role="alert">
+                {error}
+              </Alert>
             </Grid>
           )}
 
           {result !== null && (
             <Grid item xs={12}>
-              <Paper elevation={1} sx={{ p: 2, backgroundColor: 'background.default' }}>
+              <Paper 
+                elevation={1} 
+                sx={{ p: 2, backgroundColor: 'background.default' }}
+                role="region"
+                aria-label="Conversion result"
+              >
                 <Typography variant="h5" gutterBottom>
                   {amount} {fromCurrency} = {result.toFixed(2)} {toCurrency}
                 </Typography>
                 {currentRate && (
                   <Typography variant="body2" color="textSecondary">
-                    1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
+                    Exchange rate: 1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
                   </Typography>
                 )}
               </Paper>
