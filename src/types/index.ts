@@ -34,4 +34,14 @@ export interface RateAlarm {
   condition: 'above' | 'below';
   isActive: boolean;
   createdAt: Date;
+}
+
+export interface NewsItem {
+  id: string;
+  title: string;
+  description: string | null;
+  url: string;
+  imageUrl: string | null;
+  publishedAt: Date;
+  source: string;
 } 
