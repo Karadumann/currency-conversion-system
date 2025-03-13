@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { ConversionHistory, RateHistory, RateAnalysis } from '../types';
 import { currencyService } from '../services/currencyService';
 
-export const useCurrencyConverter = () => {
+interface UseCurrencyConverterProps {
+  fromCurrency: string;
+  toCurrency: string;
+}
+
+export const useCurrencyConverter = ({ fromCurrency, toCurrency }: UseCurrencyConverterProps) => {
   const [amount, setAmount] = useState<string>('');
-  const [fromCurrency, setFromCurrency] = useState<string>('USD');
-  const [toCurrency, setToCurrency] = useState<string>('EUR');
   const [result, setResult] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,18 +73,9 @@ export const useCurrencyConverter = () => {
     }
   };
 
-  const swapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  };
-
   return {
     amount,
     setAmount,
-    fromCurrency,
-    setFromCurrency,
-    toCurrency,
-    setToCurrency,
     result,
     loading,
     error,
@@ -89,7 +83,6 @@ export const useCurrencyConverter = () => {
     currentRate,
     rateHistory,
     rateAnalysis,
-    convert,
-    swapCurrencies
+    convert
   };
 }; 

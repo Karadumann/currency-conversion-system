@@ -3,10 +3,14 @@ import { CssBaseline, Container, Box, Typography, Grid } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import CurrencyConverter from './components/CurrencyConverter';
 import { NewsSection } from './components/NewsSection';
+import RateAnalysis from './components/RateAnalysis';
+import RateChart from './components/RateChart';
+import { useCurrencyConverter } from './hooks/useCurrencyConverter';
 
 export const App: React.FC = () => {
   const [fromCurrency, setFromCurrency] = useState<string>('USD');
   const [toCurrency, setToCurrency] = useState<string>('EUR');
+  const { rateHistory, rateAnalysis } = useCurrencyConverter({ fromCurrency, toCurrency });
 
   return (
     <ThemeProvider>
@@ -31,6 +35,7 @@ export const App: React.FC = () => {
               <RateAnalysis
                 fromCurrency={fromCurrency}
                 toCurrency={toCurrency}
+                analysis={rateAnalysis}
               />
             </Grid>
             
@@ -38,6 +43,7 @@ export const App: React.FC = () => {
               <RateChart
                 fromCurrency={fromCurrency}
                 toCurrency={toCurrency}
+                data={rateHistory}
               />
             </Grid>
 

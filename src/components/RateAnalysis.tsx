@@ -6,6 +6,8 @@ import {
   ListItem,
   ListItemText,
   Chip,
+  Grid,
+  Box,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -81,79 +83,100 @@ const RateAnalysis: React.FC<RateAnalysisProps> = ({ analysis, fromCurrency, toC
   return (
     <Paper 
       elevation={3} 
-      sx={{ p: 3 }}
+      sx={{ 
+        p: 4,
+        backgroundColor: 'background.paper',
+        borderRadius: 2
+      }}
       role="region"
       aria-label={`Rate analysis for ${fromCurrency} to ${toCurrency}`}
     >
-      <Typography variant="h6" component="h2" gutterBottom>
-        Rate Analysis
+      <Typography variant="h4" component="h2" gutterBottom align="center" sx={{ mb: 4 }}>
+        Historical Exchange Rate: {fromCurrency} to {toCurrency}
       </Typography>
-      <List aria-label="Exchange rate statistics">
-        <ListItem divider>
-          <ListItemText
-            primary={
-              <Typography component="h3" variant="subtitle1">
-                Highest Rate
-              </Typography>
-            }
-            secondary={
-              <Typography component="p" variant="body2">
-                {formattedValues.highestRate} on {formattedValues.highestDate}
-              </Typography>
-            }
-            aria-label={`Highest rate: ${formattedValues.highestRate} on ${formattedValues.highestDate}`}
-          />
-        </ListItem>
-        <ListItem divider>
-          <ListItemText
-            primary={
-              <Typography component="h3" variant="subtitle1">
-                Lowest Rate
-              </Typography>
-            }
-            secondary={
-              <Typography component="p" variant="body2">
-                {formattedValues.lowestRate} on {formattedValues.lowestDate}
-              </Typography>
-            }
-            aria-label={`Lowest rate: ${formattedValues.lowestRate} on ${formattedValues.lowestDate}`}
-          />
-        </ListItem>
-        <ListItem divider>
-          <ListItemText
-            primary={
-              <Typography component="h3" variant="subtitle1">
-                Average Rate
-              </Typography>
-            }
-            secondary={
-              <Typography component="p" variant="body2">
-                {formattedValues.averageRate}
-              </Typography>
-            }
-            aria-label={`Average rate: ${formattedValues.averageRate}`}
-          />
-        </ListItem>
-        <ListItem>
-          <ListItemText
-            primary={
-              <Typography component="h3" variant="subtitle1">
-                Change
-              </Typography>
-            }
-            secondary={
-              <Chip
-                icon={trendInfo.icon || undefined}
-                label={`${formattedValues.percentageChange}%`}
-                color={trendInfo.color as 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'}
-                variant="outlined"
-                role="status"
-                aria-label={`${trendInfo.description}: ${formattedValues.percentageChange}% change`}
-              />
-            }
-          />
-        </ListItem>
-      </List>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: 'background.default',
+              borderRadius: 1,
+              height: '100%'
+            }}
+          >
+            <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
+              Highest Rate
+            </Typography>
+            <Typography component="p" variant="body2" sx={{ color: 'text.secondary' }}>
+              {formattedValues.highestRate} on {formattedValues.highestDate}
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: 'background.default',
+              borderRadius: 1,
+              height: '100%'
+            }}
+          >
+            <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
+              Lowest Rate
+            </Typography>
+            <Typography component="p" variant="body2" sx={{ color: 'text.secondary' }}>
+              {formattedValues.lowestRate} on {formattedValues.lowestDate}
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: 'background.default',
+              borderRadius: 1,
+              height: '100%'
+            }}
+          >
+            <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
+              Average Rate
+            </Typography>
+            <Typography component="p" variant="body2" sx={{ color: 'text.secondary' }}>
+              {formattedValues.averageRate}
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: 'background.default',
+              borderRadius: 1,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
+              Change
+            </Typography>
+            <Chip
+              icon={trendInfo.icon || undefined}
+              label={`${formattedValues.percentageChange}%`}
+              color={trendInfo.color as 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'}
+              variant="outlined"
+              role="status"
+              aria-label={`${trendInfo.description}: ${formattedValues.percentageChange}% change`}
+              sx={{
+                fontSize: '0.9rem',
+                '& .MuiChip-icon': {
+                  fontSize: '1.2rem'
+                }
+              }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
     </Paper>
   );
 };

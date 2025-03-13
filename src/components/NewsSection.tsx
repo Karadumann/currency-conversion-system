@@ -71,7 +71,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedCurrency }) =>
       </Tabs>
 
       <Grid container spacing={2}>
-        {news.map((item) => (
+        {news.slice(0, 6).map((item) => (
           <Grid item xs={12} sm={6} md={4} key={item.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               {item.imageUrl && (
