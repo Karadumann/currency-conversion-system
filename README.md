@@ -1,46 +1,87 @@
-# Getting Started with Create React App
+# Currency Conversion System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive web application for real-time currency conversion built with React, TypeScript, and Material-UI.
+
+## Features
+
+- Real-time currency conversion
+- Interactive and responsive user interface
+- Historical exchange rate data visualization
+- Support for multiple currencies
+- Clean and modern Material-UI design
+- TypeScript for type safety
+- Responsive design for all devices
+
+## Technologies Used
+
+- React 18
+- TypeScript
+- Material-UI (MUI)
+- Axios for API calls
+- Recharts for data visualization
+- GitHub Pages for deployment
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/bkaraduman/currency-conversion-system.git
+cd currency-conversion-system
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file in the root directory and add your API key:
+```env
+REACT_APP_EXCHANGE_RATE_API_KEY=your_api_key_here
+```
+
+4. Start the development server:
+```bash
+npm start
+```
+
+The application will open in your default browser at [http://localhost:3000](http://localhost:3000).
 
 ## Available Scripts
 
-In the project directory, you can run:
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
+- `npm run deploy` - Deploys the app to GitHub Pages
 
-### `npm start`
+## Deployment
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The application is automatically deployed to GitHub Pages when you push to the main branch. You can also manually deploy using:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+npm run deploy
+```
 
-### `npm test`
+## Contributing
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### `npm run build`
+## License
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Author
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Burak Karaduman** - [GitHub](https://github.com/bkaraduman)
 
-### `npm run eject`
+## Acknowledgments
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [Material-UI](https://mui.com/) for the beautiful components
+- [Recharts](https://recharts.org/) for the data visualization
+- [Exchange Rate API](https://exchangerate-api.com/) for the currency data
