@@ -148,7 +148,7 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 <TextField
                   fullWidth
                   label="Amount"
-                  defaultValue={amount}
+                  value={amount}
                   onChange={debouncedHandleAmountChange}
                   onKeyPress={handleKeyPress}
                   type="number"
@@ -156,10 +156,14 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                   inputProps={{
                     'aria-label': 'Enter amount to convert',
                     'aria-describedby': error ? 'amount-error' : undefined,
-                    min: "0",
+                    min: "0.01",
+                    max: "999999999.99",
                     step: "0.01"
                   }}
-                  helperText={error && <span id="amount-error">{error}</span>}
+                  helperText={error || 'Enter amount between 0.01 and 999,999,999.99'}
+                  FormHelperTextProps={{
+                    error: Boolean(error)
+                  }}
                 />
               </Grid>
 
